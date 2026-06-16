@@ -7,6 +7,7 @@ import { sequelize } from './models/index.js';
 import authRoutes from './routes/authRoutes.js';
 import expertRoutes from './routes/expertRoutes.js';
 import courseRoutes from './routes/courseRoutes.js';
+import enrollmentRoutes from './routes/enrollmentRoutes.js';
 
 // Load environment variables
 dotenv.config();
@@ -29,6 +30,25 @@ app.use((req, res, next) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/experts', expertRoutes);
 app.use('/api/courses', courseRoutes);
+app.use('/api/enrollments', enrollmentRoutes);
+
+// Endpoint for client-side logging/errors
+app.post('/api/logs', (req, res) => {
+  const { level, message, details, timestamp, device } = req.body;
+  const time = timestamp ? new Date(timestamp).toLocaleTimeString() : new Date().toLocaleTimeString();
+  const border = '='.repeat(50);
+  
+  console.log(`\n${border}`);
+  console.log(`[CLIENT ${level?.toUpperCase() || 'LOG'}] at ${time}`);
+  if (message) console.log(`Message: ${message}`);
+  if (device) console.log(`Device: ${device.platform || 'unknown'} (OS: ${device.osVersion || 'unknown'})`);
+  if (details) {
+    console.log('Details:', JSON.stringify(details, null, 2));
+  }
+  console.log(`${border}\n`);
+  
+  res.status(200).json({ success: true });
+});
 
 // Base route
 app.get('/', (req, res) => {
@@ -53,7 +73,7 @@ const startServer = async () => {
     // Seed default administrator account if none exists
     await seedAdminUser();
 
-    app.listen(PORT, () => {
+    app.listen(PORT, '0.0.0.0', () => {
       console.log(`Server is running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
     });
   } catch (error) {

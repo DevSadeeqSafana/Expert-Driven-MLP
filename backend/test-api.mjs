@@ -5,7 +5,7 @@
  * Run: node test-api.mjs
  */
 
-const BASE_URL = 'http://10.153.240.193:5001/api';
+const BASE_URL = 'http://10.1.1.112:5001/api';
 
 const colors = {
   green: '\x1b[32m',
